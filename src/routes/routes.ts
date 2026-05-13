@@ -14,9 +14,13 @@ routes.post('/login', authController.login);
 
 routes.post('/categories', authMiddleware, categoryController.create);
 routes.get('/categories', authMiddleware, categoryController.index);
+routes.put('/categories/:id', authMiddleware, categoryController.update);
+routes.delete('/categories/:id', authMiddleware, categoryController.delete);
 
 routes.post('/products', authMiddleware, productController.create);
 routes.get('/products', authMiddleware, productController.index);
+routes.put('/products/:id', authMiddleware, productController.update);
+routes.delete('/products/:id', authMiddleware, productController.delete);
 
 routes.post('/register', authController.register);
 

@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { CreateCategoryService } from '../services/category/CreateCategoryService';
 import { ListCategoriesService } from '../services/category/ListCategoriesService';
+import { UpdateCategoryService } from '../services/category/UpdateCategoryService';
+import { DeleteCategoryService } from '../services/category/DeleteCategoryService';
 
 export class CategoryController {
   async create(req: Request, res: Response) {
@@ -36,6 +38,37 @@ export class CategoryController {
       return res.status(400).json({
         error: error instanceof Error ? error.message : 'Error'
       });
+    }
+  }
+
+  async update(req: Request, res: Response) {
+    try {
+      const id = String(req.params.id);
+      const { name } = req.body;
+      const userId = String(req.userId);
+
+      const service = new UpdateCategoryService();
+
+      const category = await service.execute({ id, name, userId });
+
+      return res.json(category);
+    } catch (error) {
+      return res.status(400).json({ error: error instanceof Error ? error.message : 'Error' });
+    }
+  }
+
+  async delete(req: Request, res: Response) {
+    try {
+      const id = String(req.params.id);
+      const userId = String(req.userId);
+
+      const service = new DeleteCategoryService();
+
+      await service.execute(id, userId);
+
+      return res.status(204).send();
+    } catch (error) {
+      return res.status(400).json({ error: error instanceof Error ? error.message : 'Error' });
     }
   }
 }
