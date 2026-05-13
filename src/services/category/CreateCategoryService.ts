@@ -2,15 +2,23 @@ import { prisma } from '../../lib/prisma';
 
 interface IRequest {
   name: string;
-  restaurantId: string;
+  userId: string;
 }
 
 export class CreateCategoryService {
-  async execute({ name, restaurantId }: IRequest) {
+  async execute({ name, userId }: IRequest) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
     return prisma.category.create({
       data: {
         name,
-        restaurantId
+        restaurantId: user.restaurantId
       }
     });
   }

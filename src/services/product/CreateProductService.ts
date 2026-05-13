@@ -6,13 +6,36 @@ interface IRequest {
   price: number;
   imageUrl?: string;
   categoryId: string;
-  restaurantId: string;
+  userId: string;
 }
 
 export class CreateProductService {
-  async execute(data: IRequest) {
+  async execute({ userId, categoryId, ...data }: IRequest) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const category = await prisma.category.findFirst({
+      where: {
+        id: categoryId,
+        restaurantId: user.restaurantId
+      }
+    });
+
+    if (!category) {
+      throw new Error('Category not found');
+    }
+
     return prisma.product.create({
-      data
+      data: {
+        ...data,
+        categoryId,
+        restaurantId: user.restaurantId
+      }
     });
   }
 }

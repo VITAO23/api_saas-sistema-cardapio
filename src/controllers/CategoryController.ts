@@ -4,13 +4,14 @@ import { CreateCategoryService } from '../services/category/CreateCategoryServic
 export class CategoryController {
   async create(req: Request, res: Response) {
     try {
-      const { name, restaurantId } = req.body;
+      const { name } = req.body;
+      const userId = req.userId;
 
       const service = new CreateCategoryService();
 
       const category = await service.execute({
         name,
-        restaurantId
+        userId
       });
 
       return res.status(201).json(category);

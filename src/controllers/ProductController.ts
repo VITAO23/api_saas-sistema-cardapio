@@ -6,7 +6,10 @@ export class ProductController {
     try {
       const service = new CreateProductService();
 
-      const product = await service.execute(req.body);
+      const product = await service.execute({
+        ...req.body,
+        userId: req.userId
+      });
 
       return res.status(201).json(product);
     } catch (error) {
