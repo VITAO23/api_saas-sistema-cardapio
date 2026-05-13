@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.routes = void 0;
+const express_1 = require("express");
+const AuthController_1 = require("../controllers/AuthController");
+const CategoryController_1 = require("../controllers/CategoryController");
+const ProductController_1 = require("../controllers/ProductController");
+const authMiddleware_1 = require("../middlewares/authMiddleware");
+const routes = (0, express_1.Router)();
+exports.routes = routes;
+const authController = new AuthController_1.AuthController();
+const categoryController = new CategoryController_1.CategoryController();
+const productController = new ProductController_1.ProductController();
+routes.post('/login', authController.login);
+routes.post('/categories', authMiddleware_1.authMiddleware, categoryController.create);
+routes.post('/products', authMiddleware_1.authMiddleware, productController.create);
