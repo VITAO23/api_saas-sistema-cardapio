@@ -4,8 +4,10 @@ import { prisma } from '../../lib/prisma';
 
 export class LoginService {
   async execute(email: string, password: string) {
+    const normalizedEmail = email.trim().toLowerCase();
+
     const user = await prisma.user.findUnique({
-      where: { email }
+      where: { email: normalizedEmail }
     });
 
     if (!user) {
@@ -23,8 +25,10 @@ export class LoginService {
       expiresIn: '7d'
     });
 
+    const { password: _, ...userWithoutPassword } = user;
+
     return {
-      user,
+      user: userWithoutPassword,
       token
     };
   }
