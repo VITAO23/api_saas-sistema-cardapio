@@ -2,7 +2,7 @@ import { prisma } from '../../lib/prisma';
 
 interface IRequest {
   id: string;
-  name?: string;
+  name?: string | undefined;
   userId: string;
 }
 

@@ -2,12 +2,12 @@ import { prisma } from '../../lib/prisma';
 
 interface IRequest {
   id: string;
-  name?: string;
-  description?: string;
-  price?: number;
-  imageUrl?: string;
-  available?: boolean;
-  categoryId?: string;
+  name?: string | undefined;
+  description?: string | undefined;
+  price?: number | undefined;
+  imageUrl?: string | undefined;
+  available?: boolean | undefined;
+  categoryId?: string | undefined;
   userId: string;
 }
 

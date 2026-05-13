@@ -1,11 +1,17 @@
 import { Request, Response } from 'express';
 import { LoginService } from '../services/auth/LoginService';
 import { CreateUserService } from '../services/auth/CreateUserService';
+import { LoginSchema, RegisterSchema } from '../schemas/validations';
 
 export class AuthController {
   async login(req: Request, res: Response) {
     try {
-      const { email, password } = req.body;
+      const parsed = LoginSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ errors: parsed.error.flatten() });
+      }
+
+      const { email, password } = parsed.data;
 
       const service = new LoginService();
 
@@ -21,7 +27,12 @@ export class AuthController {
 
   async register(req: Request, res: Response) {
     try {
-      const { name, email, password, restaurantId } = req.body;
+      const parsed = RegisterSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ errors: parsed.error.flatten() });
+      }
+
+      const { name, email, password, restaurantId } = parsed.data;
 
       const service = new CreateUserService();
 

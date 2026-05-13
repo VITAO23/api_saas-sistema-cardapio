@@ -3,12 +3,18 @@ import { CreateCategoryService } from '../services/category/CreateCategoryServic
 import { ListCategoriesService } from '../services/category/ListCategoriesService';
 import { UpdateCategoryService } from '../services/category/UpdateCategoryService';
 import { DeleteCategoryService } from '../services/category/DeleteCategoryService';
+import { CreateCategorySchema, UpdateCategorySchema } from '../schemas/validations';
 
 export class CategoryController {
   async create(req: Request, res: Response) {
     try {
-      const { name } = req.body;
-      const userId = req.userId;
+      const parsed = CreateCategorySchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ errors: parsed.error.flatten() });
+      }
+
+      const { name } = parsed.data;
+      const userId = String(req.userId);
 
       const service = new CreateCategoryService();
 
@@ -43,13 +49,18 @@ export class CategoryController {
 
   async update(req: Request, res: Response) {
     try {
+      const parsed = UpdateCategorySchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ errors: parsed.error.flatten() });
+      }
+
       const id = String(req.params.id);
-      const { name } = req.body;
+      const { name } = parsed.data;
       const userId = String(req.userId);
 
       const service = new UpdateCategoryService();
 
-      const category = await service.execute({ id, name, userId });
+      const category = await service.execute({ id, name: name || undefined, userId });
 
       return res.json(category);
     } catch (error) {
