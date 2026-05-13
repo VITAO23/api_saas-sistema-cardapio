@@ -13,8 +13,10 @@ const productController = new ProductController();
 routes.post('/login', authController.login);
 
 routes.post('/categories', authMiddleware, categoryController.create);
+routes.get('/categories', authMiddleware, categoryController.index);
 
 routes.post('/products', authMiddleware, productController.create);
+routes.get('/products', authMiddleware, productController.index);
 
 routes.post('/register', authController.register);
 
