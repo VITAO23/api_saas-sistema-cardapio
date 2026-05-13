@@ -1,5 +1,27 @@
 import { z } from 'zod';
 
+const stringToBoolean = z.preprocess((value) => {
+  if (typeof value === 'string') {
+    if (value.toLowerCase() === 'true') {
+      return true;
+    }
+
+    if (value.toLowerCase() === 'false') {
+      return false;
+    }
+  }
+
+  return value;
+}, z.boolean());
+
+const stringToPositiveNumber = z.preprocess((value) => {
+  if (typeof value === 'string' && value.trim() !== '') {
+    return Number(value);
+  }
+
+  return value;
+}, z.number().positive('Preço deve ser um número positivo'));
+
 export const RegisterSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   email: z.string().email('Email inválido'),
@@ -23,19 +45,19 @@ export const UpdateCategorySchema = z.object({
 export const CreateProductSchema = z.object({
   name: z.string().min(2, 'Nome do produto deve ter pelo menos 2 caracteres'),
   description: z.string().optional(),
-  price: z.number().positive('Preço deve ser um número positivo'),
+  price: stringToPositiveNumber,
   imageUrl: z.string().url('URL da imagem inválida').optional().or(z.literal('')),
   categoryId: z.string().uuid('ID da categoria inválido'),
-  available: z.boolean().optional().default(true)
+  available: stringToBoolean.optional().default(true)
 });
 
 export const UpdateProductSchema = z.object({
   name: z.string().min(2, 'Nome do produto deve ter pelo menos 2 caracteres').optional(),
   description: z.string().optional(),
-  price: z.number().positive('Preço deve ser um número positivo').optional(),
+  price: stringToPositiveNumber.optional(),
   imageUrl: z.string().url('URL da imagem inválida').optional().or(z.literal('')),
   categoryId: z.string().uuid('ID da categoria inválido').optional(),
-  available: z.boolean().optional()
+  available: stringToBoolean.optional()
 });
 
 export type RegisterType = z.infer<typeof RegisterSchema>;

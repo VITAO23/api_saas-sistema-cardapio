@@ -5,18 +5,29 @@ import { UpdateProductService } from '../services/product/UpdateProductService';
 import { DeleteProductService } from '../services/product/DeleteProductService';
 import { CreateProductSchema, UpdateProductSchema } from '../schemas/validations';
 
+function buildImageUrl(fileName?: string) {
+  if (!fileName) {
+    return undefined;
+  }
+
+  return `/uploads/products/${fileName}`;
+}
+
 export class ProductController {
   async create(req: Request, res: Response) {
     try {
+      const requestWithFile = req as Request & { file?: Express.Multer.File };
       const parsed = CreateProductSchema.safeParse(req.body);
       if (!parsed.success) {
         return res.status(400).json({ errors: parsed.error.flatten() });
       }
 
       const service = new CreateProductService();
+      const imageUrl = buildImageUrl(requestWithFile.file?.filename) ?? parsed.data.imageUrl;
 
       const product = await service.execute({
         ...parsed.data,
+        imageUrl,
         userId: String(req.userId)
       });
 
@@ -46,6 +57,7 @@ export class ProductController {
 
   async update(req: Request, res: Response) {
     try {
+      const requestWithFile = req as Request & { file?: Express.Multer.File };
       const parsed = UpdateProductSchema.safeParse(req.body);
       if (!parsed.success) {
         return res.status(400).json({ errors: parsed.error.flatten() });
@@ -55,8 +67,14 @@ export class ProductController {
       const userId = String(req.userId);
 
       const service = new UpdateProductService();
+      const imageUrl = buildImageUrl(requestWithFile.file?.filename) ?? parsed.data.imageUrl;
 
-      const product = await service.execute({ id, userId, ...parsed.data });
+      const product = await service.execute({
+        id,
+        userId,
+        ...parsed.data,
+        imageUrl
+      });
 
       return res.json(product);
     } catch (error) {
