@@ -35,21 +35,22 @@ app.use(
 	})
 );
 
-app.use(
-	cors({
-		origin: (origin, callback) => {
-			if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
-				callback(null, true);
-				return;
-			}
+const corsOptions = {
+	origin: (origin: any, callback: (err: Error | null, allow?: boolean) => void) => {
+		if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+			callback(null, true);
+			return;
+		}
 
-			callback(new Error('Origin not allowed by CORS'));
-		},
-		methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-		allowedHeaders: ['Content-Type', 'Authorization'],
-		credentials: true
-	})
-);
+		callback(new Error('Origin not allowed by CORS'));
+	},
+	methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+	allowedHeaders: ['Content-Type', 'Authorization'],
+	credentials: true,
+	optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 

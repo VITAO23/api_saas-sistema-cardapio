@@ -12,6 +12,9 @@ export class DeleteCategoryService {
       throw new Error('Category not found');
     }
 
+    // Remove products that belong to this category first to avoid FK constraint errors
+    await prisma.product.deleteMany({ where: { categoryId: id } });
+
     return prisma.category.delete({ where: { id } });
   }
 }
