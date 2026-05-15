@@ -3,8 +3,10 @@ import { AuthController } from '../controllers/AuthController';
 import { CategoryController } from '../controllers/CategoryController';
 import { ProductController } from '../controllers/ProductController';
 import { PublicController } from '../controllers/PublicController';
+import { RestaurantController } from '../controllers/RestaurantController';
 import { authMiddleware } from '../middlewares/authMiddleware';
 import { uploadProductImage } from '../middlewares/uploadProductImage';
+import { createUploadMiddleware } from '../middlewares/uploadMiddleware';
 
 const routes = Router();
 
@@ -12,6 +14,17 @@ const authController = new AuthController();
 const categoryController = new CategoryController();
 const productController = new ProductController();
 const publicController = new PublicController();
+const restaurantController = new RestaurantController();
+
+const uploadAvatarMiddleware = createUploadMiddleware({
+  folder: 'avatars',
+  fieldName: 'avatar'
+});
+
+const uploadLogoMiddleware = createUploadMiddleware({
+  folder: 'logos',
+  fieldName: 'logo'
+});
 
 routes.post('/login', authController.login);
 
@@ -26,6 +39,16 @@ routes.put('/products/:id', authMiddleware, uploadProductImage, productControlle
 routes.delete('/products/:id', authMiddleware, productController.delete);
 
 routes.post('/register', authController.register);
+
+// User profile routes (authenticated)
+routes.get('/users/me', authMiddleware, authController.me);
+routes.put('/users/me', authMiddleware, authController.updateMe);
+routes.post('/users/me/avatar', authMiddleware, uploadAvatarMiddleware, authController.uploadAvatar);
+
+// Authenticated restaurant routes for admin automation
+routes.get('/restaurants/me', authMiddleware, restaurantController.me);
+routes.get('/restaurants/me/qr', authMiddleware, restaurantController.myQr);
+routes.post('/restaurants/me/logo', authMiddleware, uploadLogoMiddleware, restaurantController.uploadLogo);
 
 // Public menu routes (no auth)
 routes.get('/r/:slug', publicController.show);

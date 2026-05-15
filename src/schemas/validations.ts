@@ -60,9 +60,16 @@ export const UpdateProductSchema = z.object({
   available: stringToBoolean.optional()
 });
 
+export const UpdateUserProfileSchema = z.object({
+  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres').optional(),
+  email: z.string().email('Email inválido').optional(),
+  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres').optional()
+});
+
 export type RegisterType = z.infer<typeof RegisterSchema>;
 export type LoginType = z.infer<typeof LoginSchema>;
 export type CreateCategoryType = z.infer<typeof CreateCategorySchema>;
 export type UpdateCategoryType = z.infer<typeof UpdateCategorySchema>;
 export type CreateProductType = z.infer<typeof CreateProductSchema>;
 export type UpdateProductType = z.infer<typeof UpdateProductSchema>;
+export type UpdateUserProfileType = z.infer<typeof UpdateUserProfileSchema>;

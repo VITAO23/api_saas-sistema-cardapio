@@ -12,6 +12,7 @@ model Restaurant {
   name        String
   slug        String      @unique
   whatsapp    String
+  logoUrl     String?
   createdAt   DateTime    @default(now())
 
   users       User[]
@@ -25,6 +26,7 @@ model User {
   email         String      @unique
   password      String
   role          String
+  avatarUrl     String?
   restaurantId  String
 
   restaurant Restaurant @relation(fields: [restaurantId], references: [id])

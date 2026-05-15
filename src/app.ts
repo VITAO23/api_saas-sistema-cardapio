@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
@@ -25,8 +27,8 @@ app.use(
 
 app.use(
 	rateLimit({
-		windowMs: Number.isFinite(windowMs) ? windowMs : 900000,
-		max: Number.isFinite(maxRequests) ? maxRequests : 100,
+		windowMs: Number.isFinite(windowMs) ? windowMs : 9000000,
+		max: Number.isFinite(maxRequests) ? maxRequests : 1000,
 		standardHeaders: true,
 		legacyHeaders: false,
 		message: {
@@ -36,14 +38,16 @@ app.use(
 );
 
 const corsOptions = {
-	origin: (origin: any, callback: (err: Error | null, allow?: boolean) => void) => {
-		if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
-			callback(null, true);
-			return;
-		}
+	origin: (origin, callback) => {
 
-		callback(new Error('Origin not allowed by CORS'));
-	},
+
+	if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+		callback(null, true);
+		return;
+	}
+
+	callback(new Error('Origin not allowed by CORS'));
+},
 	methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 	allowedHeaders: ['Content-Type', 'Authorization'],
 	credentials: true,

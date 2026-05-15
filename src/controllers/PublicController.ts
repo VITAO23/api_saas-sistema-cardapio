@@ -1,6 +1,27 @@
 import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 
+function getPublicOrigin() {
+  const corsOrigins = (process.env.CORS_ORIGINS ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter((origin) => origin.length > 0);
+
+  return process.env.PUBLIC_ORIGIN ?? corsOrigins[0] ?? `http://localhost:${process.env.PORT ?? 3333}`;
+}
+
+function toAbsoluteUrl(url?: string | null) {
+  if (!url) {
+    return undefined;
+  }
+
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+
+  return `${getPublicOrigin()}${url}`;
+}
+
 export class PublicController {
   async show(req: Request, res: Response) {
     const { slug } = req.params;
@@ -11,8 +32,7 @@ export class PublicController {
         id: true,
         name: true,
         whatsapp: true,
-        // optional fields if present
-        // logo, banner, mainColor etc. may be added later
+        logoUrl: true,
         categories: {
           select: {
             id: true,
@@ -36,7 +56,33 @@ export class PublicController {
       return res.status(404).json({ error: 'Restaurant not found' });
     }
 
-    return res.json(restaurant);
+    return res.json({
+      ...restaurant,
+      logoUrl: toAbsoluteUrl(restaurant.logoUrl),
+      categories: restaurant.categories.map((category: {
+        id: string;
+        name: string;
+        products: Array<{
+          id: string;
+          name: string;
+          description: string | null;
+          price: number;
+          imageUrl: string | null;
+        }>;
+      }) => ({
+        ...category,
+        products: category.products.map((product: {
+          id: string;
+          name: string;
+          description: string | null;
+          price: number;
+          imageUrl: string | null;
+        }) => ({
+          ...product,
+          imageUrl: toAbsoluteUrl(product.imageUrl)
+        }))
+      }))
+    });
   }
 
   async qr(req: Request, res: Response) {
