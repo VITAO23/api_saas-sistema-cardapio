@@ -153,7 +153,7 @@ export class AuthController {
         }
       });
 
-      return res.json({ user, avatarUrl });
+      return res.json({ user, avatarUrl: user.avatarUrl });
     } catch (error) {
       return res.status(400).json({
         error: error instanceof Error ? error.message : 'Error'

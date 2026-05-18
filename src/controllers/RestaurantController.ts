@@ -1,14 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
-
-function getPublicOrigin() {
-  const corsOrigins = (process.env.CORS_ORIGINS ?? '')
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter((origin) => origin.length > 0);
-
-  return process.env.PUBLIC_ORIGIN ?? corsOrigins[0] ?? `http://localhost:${process.env.PORT ?? 3333}`;
-}
+import { getPublicOrigin } from '../lib/urlUtils';
 
 export class RestaurantController {
   async me(req: Request, res: Response) {
@@ -108,7 +100,7 @@ export class RestaurantController {
         }
       });
 
-      return res.json({ restaurant, logoUrl });
+      return res.json({ restaurant, logoUrl: restaurant.logoUrl });
     } catch (error) {
       return res.status(400).json({
         error: error instanceof Error ? error.message : 'Error'

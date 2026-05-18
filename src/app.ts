@@ -39,15 +39,27 @@ app.use(
 
 const corsOptions = {
 	origin: (origin, callback) => {
+		// Allow requests without origin (e.g., same-origin requests)
+		if (!origin) {
+			callback(null, true);
+			return;
+		}
 
+		// If no origins configured, allow all
+		if (allowedOrigins.length === 0) {
+			callback(null, true);
+			return;
+		}
 
-	if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
-		callback(null, true);
-		return;
-	}
+		// Check if origin is in allowed list
+		if (allowedOrigins.includes(origin)) {
+			callback(null, true);
+			return;
+		}
 
-	callback(new Error('Origin not allowed by CORS'));
-},
+		// Origin not allowed, but don't throw error - just deny silently
+		callback(null, false);
+	},
 	methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 	allowedHeaders: ['Content-Type', 'Authorization'],
 	credentials: true,
