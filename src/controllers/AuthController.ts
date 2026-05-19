@@ -8,12 +8,17 @@ import bcrypt from 'bcryptjs';
 export class AuthController {
   async login(req: Request, res: Response) {
     try {
+      // Debug: log raw incoming body to diagnose invalid Prisma where invocation
+      console.log('[Auth] POST /login body:', req.body);
       const parsed = LoginSchema.safeParse(req.body);
       if (!parsed.success) {
         return res.status(400).json({ errors: parsed.error.flatten() });
       }
 
       const { email, password } = parsed.data;
+
+      // Debug: log email only (avoid logging passwords)
+      console.log('[Auth] login attempt for:', email);
 
       const service = new LoginService();
 

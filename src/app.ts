@@ -25,18 +25,6 @@ app.use(
 	})
 );
 
-app.use(
-	rateLimit({
-		windowMs: Number.isFinite(windowMs) ? windowMs : 9000000,
-		max: Number.isFinite(maxRequests) ? maxRequests : 1000,
-		standardHeaders: true,
-		legacyHeaders: false,
-		message: {
-			error: 'Too many requests, please try again later.'
-		}
-	})
-);
-
 const corsOptions = {
 	origin: (origin, callback) => {
 		// Allow requests without origin (e.g., same-origin requests)
@@ -67,6 +55,18 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+app.use(
+	rateLimit({
+		windowMs: Number.isFinite(windowMs) ? windowMs : 9000000,
+		max: Number.isFinite(maxRequests) ? maxRequests : 1000,
+		standardHeaders: true,
+		legacyHeaders: false,
+		message: {
+			error: 'Too many requests, please try again later.'
+		}
+	})
+);
 app.use(express.json());
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
