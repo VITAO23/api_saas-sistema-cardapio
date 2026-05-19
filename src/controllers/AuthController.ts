@@ -97,10 +97,10 @@ export class AuthController {
         return res.status(400).json({ errors: parsed.error.flatten() });
       }
 
-      const { name, email, password } = parsed.data;
-      const updateData: any = {};
+      const { name, email, password, restaurantAddress } = parsed.data;
+      const updateUserData: any = {};
 
-      if (name) updateData.name = name;
+      if (name) updateUserData.name = name;
       if (email) {
         // Check if email already exists
         const existingUser = await prisma.user.findUnique({
@@ -111,17 +111,35 @@ export class AuthController {
           return res.status(409).json({ error: 'Email already in use' });
         }
 
-        updateData.email = email.toLowerCase();
+        updateUserData.email = email.toLowerCase();
       }
 
       if (password) {
         const hashedPassword = await bcrypt.hash(password, 8);
-        updateData.password = hashedPassword;
+        updateUserData.password = hashedPassword;
       }
 
-      const user = await prisma.user.update({
+      // Get user's restaurant ID
+      const user = await prisma.user.findUnique({
         where: { id: req.userId },
-        data: updateData,
+        select: { restaurantId: true }
+      });
+
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Update restaurant address if provided
+      if (restaurantAddress !== undefined) {
+        await prisma.restaurant.update({
+          where: { id: user.restaurantId },
+          data: { address: restaurantAddress }
+        });
+      }
+
+      const updatedUser = await prisma.user.update({
+        where: { id: req.userId },
+        data: updateUserData,
         select: {
           id: true,
           name: true,
@@ -131,7 +149,7 @@ export class AuthController {
         }
       });
 
-      return res.json(user);
+      return res.json(updatedUser);
     } catch (error) {
       return res.status(400).json({
         error: error instanceof Error ? error.message : 'Error'

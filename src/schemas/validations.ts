@@ -63,7 +63,8 @@ export const UpdateProductSchema = z.object({
 export const UpdateUserProfileSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres').optional(),
   email: z.string().email('Email inválido').optional(),
-  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres').optional()
+  password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres').optional(),
+  restaurantAddress: z.string().optional()
 });
 
 export type RegisterType = z.infer<typeof RegisterSchema>;

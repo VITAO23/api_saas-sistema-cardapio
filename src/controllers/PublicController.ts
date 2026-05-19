@@ -12,7 +12,17 @@ export class PublicController {
         id: true,
         name: true,
         whatsapp: true,
+        address: true,
         logoUrl: true,
+        status: true,
+        openingHours: true,
+        deliveryEnabled: true,
+        deliveryTime: true,
+        pickupTime: true,
+        deliveryInfo: true,
+        deliveryFee: true,
+        deliveryRadiusKm: true,
+        deliveryArea: true,
         categories: {
           select: {
             id: true,

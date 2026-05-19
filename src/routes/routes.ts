@@ -47,8 +47,10 @@ routes.post('/users/me/avatar', authMiddleware, uploadAvatarMiddleware, authCont
 
 // Authenticated restaurant routes for admin automation
 routes.get('/restaurants/me', authMiddleware, restaurantController.me);
+routes.put('/restaurants/me', authMiddleware, restaurantController.update);
 routes.get('/restaurants/me/qr', authMiddleware, restaurantController.myQr);
 routes.post('/restaurants/me/logo', authMiddleware, uploadLogoMiddleware, restaurantController.uploadLogo);
+routes.post('/restaurants/:id/delivery-area', authMiddleware, restaurantController.setDeliveryArea);
 
 // Public menu routes (no auth)
 routes.get('/r/:slug', publicController.show);
