@@ -7,8 +7,8 @@ const prisma = new PrismaClient();
 
 async function main() {
   const restaurantData = {
-    name: 'Restaurante Demo',
-    slug: 'restaurante-demo',
+    name: 'Restaurante Teste',
+    slug: 'restaurante-teste',
     whatsapp: '31999990000'
   };
 
