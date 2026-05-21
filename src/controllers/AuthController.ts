@@ -39,15 +39,14 @@ export class AuthController {
         return res.status(400).json({ errors: parsed.error.flatten() });
       }
 
-      const { name, email, password, restaurantId } = parsed.data;
+      const { name, email, password } = parsed.data;
 
       const service = new CreateUserService();
 
       const user = await service.execute({
         name,
         email,
-        password,
-        restaurantId
+        password
       });
 
       return res.status(201).json(user);
@@ -131,6 +130,10 @@ export class AuthController {
 
       // Update restaurant address if provided
       if (restaurantAddress !== undefined) {
+        if (!user.restaurantId) {
+          return res.status(400).json({ error: 'User has no restaurant assigned' });
+        }
+
         await prisma.restaurant.update({
           where: { id: user.restaurantId },
           data: { address: restaurantAddress }

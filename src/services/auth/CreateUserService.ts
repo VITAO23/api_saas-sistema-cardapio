@@ -5,11 +5,10 @@ interface IRequest {
   name: string;
   email: string;
   password: string;
-  restaurantId: string;
 }
 
 export class CreateUserService {
-  async execute({ name, email, password, restaurantId }: IRequest) {
+  async execute({ name, email, password }: IRequest) {
     const normalizedEmail = email.trim().toLowerCase();
 
     // Validate email format (simple)
@@ -26,14 +25,6 @@ export class CreateUserService {
       throw new Error('User already exists');
     }
 
-    const restaurantExists = await prisma.restaurant.findUnique({
-      where: { id: restaurantId }
-    });
-
-    if (!restaurantExists) {
-      throw new Error('Restaurant not found');
-    }
-
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -43,8 +34,7 @@ export class CreateUserService {
         name,
         email: normalizedEmail,
         password: hashedPassword,
-        role: 'owner',
-        restaurantId
+        role: 'user'
       }
     });
 
