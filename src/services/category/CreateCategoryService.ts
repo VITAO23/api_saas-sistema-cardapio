@@ -15,6 +15,10 @@ export class CreateCategoryService {
       throw new Error('User not found');
     }
 
+    if (!user.restaurantId) {
+      throw new Error('Restaurant not assigned yet');
+    }
+
     return prisma.category.create({
       data: {
         name,

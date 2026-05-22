@@ -8,6 +8,10 @@ export class ListCategoriesService {
       throw new Error('User not found');
     }
 
+    if (!user.restaurantId) {
+      return [];
+    }
+
     return prisma.category.findMany({ where: { restaurantId: user.restaurantId } });
   }
 }

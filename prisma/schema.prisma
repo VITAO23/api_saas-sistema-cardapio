@@ -13,6 +13,13 @@ model Restaurant {
   slug        String      @unique
   whatsapp    String
   address     String?
+  street      String?
+  number      String?
+  complement  String?
+  neighborhood String?
+  city        String?
+  state       String?
+  zipCode     String?
   status      String?
   openingHours String?
   deliveryEnabled Boolean? @default(false)

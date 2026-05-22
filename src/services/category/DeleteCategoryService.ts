@@ -5,6 +5,7 @@ export class DeleteCategoryService {
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
     if (!user) throw new Error('User not found');
+    if (!user.restaurantId) throw new Error('Restaurant not assigned yet');
 
     const category = await prisma.category.findUnique({ where: { id } });
 

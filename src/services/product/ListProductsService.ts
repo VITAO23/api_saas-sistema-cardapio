@@ -8,6 +8,10 @@ export class ListProductsService {
       throw new Error('User not found');
     }
 
+    if (!user.restaurantId) {
+      return [];
+    }
+
     return prisma.product.findMany({
       where: { restaurantId: user.restaurantId },
       include: { category: true }

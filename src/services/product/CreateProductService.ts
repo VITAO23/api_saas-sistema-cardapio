@@ -20,6 +20,10 @@ export class CreateProductService {
       throw new Error('User not found');
     }
 
+    if (!user.restaurantId) {
+      throw new Error('Restaurant not assigned yet');
+    }
+
     const category = await prisma.category.findFirst({
       where: {
         id: categoryId,
