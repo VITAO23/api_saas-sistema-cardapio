@@ -14,7 +14,14 @@ export class ListProductsService {
 
     return prisma.product.findMany({
       where: { restaurantId: user.restaurantId },
-      include: { category: true }
+      include: {
+        category: true,
+        optionGroups: {
+          include: {
+            options: true
+          }
+        }
+      }
     });
   }
 }

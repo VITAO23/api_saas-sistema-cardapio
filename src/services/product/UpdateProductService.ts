@@ -9,10 +9,19 @@ interface IRequest {
   available?: boolean | undefined;
   categoryId?: string | undefined;
   userId: string;
+  optionGroups?: Array<{
+    name: string;
+    multiple?: boolean;
+    required?: boolean;
+    options?: Array<{
+      name: string;
+      price?: number | null;
+    }>;
+  }>;
 }
 
 export class UpdateProductService {
-  async execute({ id, categoryId, userId, ...data }: IRequest) {
+  async execute({ id, categoryId, userId, optionGroups, ...data }: IRequest) {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new Error('User not found');
     if (!user.restaurantId) throw new Error('Restaurant not assigned yet');
@@ -29,6 +38,42 @@ export class UpdateProductService {
       }
     }
 
-    return prisma.product.update({ where: { id }, data: { ...data, categoryId } });
+    const updatedProduct = await prisma.product.update({
+      where: { id },
+      data: {
+        ...data,
+        categoryId
+      }
+    });
+
+    if (optionGroups) {
+      await prisma.productOptionGroup.deleteMany({
+        where: { productId: id }
+      });
+
+      await prisma.product.update({
+        where: { id },
+        data: {
+          optionGroups: {
+            create: optionGroups.map((group) => ({
+              name: group.name,
+              multiple: group.multiple ?? false,
+              required: group.required ?? false,
+              options: {
+                create: (group.options ?? []).map((option) => ({
+                  name: option.name,
+                  price: option.price ?? null
+                }))
+              }
+            }))
+          }
+        }
+      });
+    }
+
+    return prisma.product.findUnique({
+      where: { id },
+      include: { optionGroups: { include: { options: true } } }
+    });
   }
 }

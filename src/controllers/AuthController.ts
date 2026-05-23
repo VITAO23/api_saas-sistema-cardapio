@@ -4,6 +4,7 @@ import { CreateUserService } from '../services/auth/CreateUserService';
 import { LoginSchema, RegisterSchema, UpdateUserProfileSchema } from '../schemas/validations';
 import { prisma } from '../lib/prisma';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 export class AuthController {
   async login(req: Request, res: Response) {
@@ -49,7 +50,12 @@ export class AuthController {
         password
       });
 
-      return res.status(201).json(user);
+      const token = jwt.sign({}, process.env.JWT_SECRET as string, {
+        subject: user.id,
+        expiresIn: '7d'
+      });
+
+      return res.status(201).json({ user, token });
     } catch (error) {
       return res.status(400).json({
         error: error instanceof Error ? error.message : 'Error'

@@ -16,6 +16,7 @@ const allowedOrigins = (process.env.CORS_ORIGINS ?? '')
 
 const windowMs = Number(process.env.RATE_LIMIT_WINDOW_MS ?? '900000');
 const maxRequests = Number(process.env.RATE_LIMIT_MAX ?? '100');
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 app.set('trust proxy', process.env.TRUST_PROXY === 'true');
 
@@ -56,17 +57,19 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use(
-	rateLimit({
-		windowMs: Number.isFinite(windowMs) ? windowMs : 9000000,
-		max: Number.isFinite(maxRequests) ? maxRequests : 1000,
-		standardHeaders: true,
-		legacyHeaders: false,
-		message: {
-			error: 'Too many requests, please try again later.'
-		}
-	})
-);
+if (!isDevelopment) {
+	app.use(
+		rateLimit({
+			windowMs: Number.isFinite(windowMs) ? windowMs : 9000000,
+			max: Number.isFinite(maxRequests) ? maxRequests : 1000,
+			standardHeaders: true,
+			legacyHeaders: false,
+			message: {
+				error: 'Too many requests, please try again later.'
+			}
+		})
+	);
+}
 app.use(express.json());
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 

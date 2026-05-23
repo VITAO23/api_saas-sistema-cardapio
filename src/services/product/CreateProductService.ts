@@ -8,10 +8,19 @@ interface IRequest {
   categoryId: string;
   available: boolean;
   userId: string;
+  optionGroups?: Array<{
+    name: string;
+    multiple?: boolean;
+    required?: boolean;
+    options?: Array<{
+      name: string;
+      price?: number | null;
+    }>;
+  }>;
 }
 
 export class CreateProductService {
-  async execute({ userId, categoryId, ...data }: IRequest) {
+  async execute({ userId, categoryId, optionGroups = [], ...data }: IRequest) {
     const user = await prisma.user.findUnique({
       where: { id: userId }
     });
@@ -39,7 +48,27 @@ export class CreateProductService {
       data: {
         ...data,
         categoryId,
-        restaurantId: user.restaurantId
+        restaurantId: user.restaurantId,
+        optionGroups: {
+          create: optionGroups.map((group) => ({
+            name: group.name,
+            multiple: group.multiple ?? false,
+            required: group.required ?? false,
+            options: {
+              create: (group.options ?? []).map((option) => ({
+                name: option.name,
+                price: option.price ?? null
+              }))
+            }
+          }))
+        }
+      },
+      include: {
+        optionGroups: {
+          include: {
+            options: true
+          }
+        }
       }
     });
   }

@@ -13,11 +13,26 @@ function buildImageUrl(fileName?: string) {
   return `/uploads/products/${fileName}`;
 }
 
+function parseOptionGroups(value: unknown) {
+  if (typeof value !== 'string') {
+    return value;
+  }
+
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
+
 export class ProductController {
   async create(req: Request, res: Response) {
     try {
       const requestWithFile = req as Request & { file?: Express.Multer.File };
-      const parsed = CreateProductSchema.safeParse(req.body);
+      const parsed = CreateProductSchema.safeParse({
+        ...req.body,
+        optionGroups: parseOptionGroups(req.body.optionGroups)
+      });
       if (!parsed.success) {
         return res.status(400).json({ errors: parsed.error.flatten() });
       }
@@ -58,7 +73,10 @@ export class ProductController {
   async update(req: Request, res: Response) {
     try {
       const requestWithFile = req as Request & { file?: Express.Multer.File };
-      const parsed = UpdateProductSchema.safeParse(req.body);
+      const parsed = UpdateProductSchema.safeParse({
+        ...req.body,
+        optionGroups: parseOptionGroups(req.body.optionGroups)
+      });
       if (!parsed.success) {
         return res.status(400).json({ errors: parsed.error.flatten() });
       }

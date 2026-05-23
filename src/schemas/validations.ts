@@ -22,6 +22,30 @@ const stringToPositiveNumber = z.preprocess((value) => {
   return value;
 }, z.number().positive('Preço deve ser um número positivo'));
 
+const ProductOptionSchema = z.object({
+  name: z.string().min(1, 'Nome da opção é obrigatório'),
+  price: z
+    .preprocess((value) => {
+      if (value === '' || value === null || value === undefined) {
+        return null;
+      }
+
+      if (typeof value === 'string' && value.trim() !== '') {
+        return Number(value);
+      }
+
+      return value;
+    }, z.number().positive('Preço da opção deve ser positivo').nullable())
+    .optional()
+});
+
+const ProductOptionGroupSchema = z.object({
+  name: z.string().min(1, 'Nome do grupo é obrigatório'),
+  multiple: z.boolean().optional().default(false),
+  required: z.boolean().optional().default(false),
+  options: z.array(ProductOptionSchema).default([])
+});
+
 export const RegisterSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   email: z.string().email('Email inválido'),
@@ -47,7 +71,8 @@ export const CreateProductSchema = z.object({
   price: stringToPositiveNumber,
   imageUrl: z.string().url('URL da imagem inválida').optional().or(z.literal('')),
   categoryId: z.string().uuid('ID da categoria inválido'),
-  available: stringToBoolean.optional().default(true)
+  available: stringToBoolean.optional().default(true),
+  optionGroups: z.array(ProductOptionGroupSchema).optional().default([])
 });
 
 export const UpdateProductSchema = z.object({
@@ -56,7 +81,8 @@ export const UpdateProductSchema = z.object({
   price: stringToPositiveNumber.optional(),
   imageUrl: z.string().url('URL da imagem inválida').optional().or(z.literal('')),
   categoryId: z.string().uuid('ID da categoria inválido').optional(),
-  available: stringToBoolean.optional()
+  available: stringToBoolean.optional(),
+  optionGroups: z.array(ProductOptionGroupSchema).optional()
 });
 
 export const UpdateUserProfileSchema = z.object({
