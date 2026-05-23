@@ -2,6 +2,27 @@ import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 import { getPublicOrigin, resolvePublicAssetUrl } from '../lib/urlUtils';
 
+function normalizeRestaurantAssets<T extends { logoUrl: string | null }>(restaurant: T) {
+  return {
+    ...restaurant,
+    logoUrl: resolvePublicAssetUrl(restaurant.logoUrl)
+  };
+}
+
+function normalizeCategories(categories: Array<{
+  id: string;
+  name: string;
+  products: Array<{ id: string; name: string; description: string | null; price: number; imageUrl: string | null }>;
+}>) {
+  return categories.map((category) => ({
+    ...category,
+    products: category.products.map((product) => ({
+      ...product,
+      imageUrl: resolvePublicAssetUrl(product.imageUrl)
+    }))
+  }));
+}
+
 export class PublicController {
   async show(req: Request, res: Response) {
     const { slug } = req.params;
@@ -54,8 +75,8 @@ export class PublicController {
     }
 
     return res.json({
-      ...restaurant,
-      logoUrl: resolvePublicAssetUrl(restaurant.logoUrl)
+      ...normalizeRestaurantAssets(restaurant),
+      categories: normalizeCategories(restaurant.categories)
     });
   }
 

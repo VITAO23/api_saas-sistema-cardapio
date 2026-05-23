@@ -19,11 +19,13 @@ const publicController = new PublicController_1.PublicController();
 const restaurantController = new RestaurantController_1.RestaurantController();
 const uploadAvatarMiddleware = (0, uploadToSupabase_1.createSupabaseUploadMiddleware)({
     folder: 'avatars',
-    fieldName: 'avatar'
+    fieldName: 'avatar',
+    bucket: 'avatars'
 });
 const uploadLogoMiddleware = (0, uploadToSupabase_1.createSupabaseUploadMiddleware)({
-    folder: 'logos',
-    fieldName: 'logo'
+    folder: 'logo',
+    fieldName: 'logo',
+    bucket: 'logo'
 });
 routes.post('/login', authController.login);
 routes.post('/categories', authMiddleware_1.authMiddleware, categoryController.create);

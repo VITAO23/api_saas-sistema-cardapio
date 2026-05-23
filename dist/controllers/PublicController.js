@@ -3,6 +3,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PublicController = void 0;
 const prisma_1 = require("../lib/prisma");
 const urlUtils_1 = require("../lib/urlUtils");
+function normalizeRestaurantAssets(restaurant) {
+    return {
+        ...restaurant,
+        logoUrl: (0, urlUtils_1.resolvePublicAssetUrl)(restaurant.logoUrl)
+    };
+}
+function normalizeCategories(categories) {
+    return categories.map((category) => ({
+        ...category,
+        products: category.products.map((product) => ({
+            ...product,
+            imageUrl: (0, urlUtils_1.resolvePublicAssetUrl)(product.imageUrl)
+        }))
+    }));
+}
 class PublicController {
     async show(req, res) {
         const { slug } = req.params;
@@ -52,8 +67,8 @@ class PublicController {
             return res.status(404).json({ error: 'Restaurant not found' });
         }
         return res.json({
-            ...restaurant,
-            logoUrl: (0, urlUtils_1.resolvePublicAssetUrl)(restaurant.logoUrl)
+            ...normalizeRestaurantAssets(restaurant),
+            categories: normalizeCategories(restaurant.categories)
         });
     }
     async qr(req, res) {
