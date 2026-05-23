@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../lib/prisma';
-import { getPublicOrigin } from '../lib/urlUtils';
+import { getPublicOrigin, resolvePublicAssetUrl } from '../lib/urlUtils';
 
 export class RestaurantController {
   async me(req: Request, res: Response) {
@@ -143,7 +143,7 @@ export class RestaurantController {
         return res.status(400).json({ error: 'Restaurant not assigned yet' });
       }
 
-      const logoUrl = (req.file as any).publicUrl ?? `/uploads/logos/${(req.file as any).filename}`;
+      const logoUrl = resolvePublicAssetUrl((req.file as any).publicUrl ?? `/uploads/logos/${(req.file as any).filename}`);
 
       const restaurant = await prisma.restaurant.update({
         where: { id: user.restaurantId },

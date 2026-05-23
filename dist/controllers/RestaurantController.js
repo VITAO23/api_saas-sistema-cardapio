@@ -126,7 +126,7 @@ class RestaurantController {
             if (!user.restaurantId) {
                 return res.status(400).json({ error: 'Restaurant not assigned yet' });
             }
-            const logoUrl = req.file.publicUrl ?? `/uploads/logos/${req.file.filename}`;
+            const logoUrl = (0, urlUtils_1.resolvePublicAssetUrl)(req.file.publicUrl ?? `/uploads/logos/${req.file.filename}`);
             const restaurant = await prisma_1.prisma.restaurant.update({
                 where: { id: user.restaurantId },
                 data: { logoUrl },

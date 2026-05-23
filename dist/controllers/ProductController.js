@@ -6,15 +6,12 @@ const ListProductsService_1 = require("../services/product/ListProductsService")
 const UpdateProductService_1 = require("../services/product/UpdateProductService");
 const DeleteProductService_1 = require("../services/product/DeleteProductService");
 const validations_1 = require("../schemas/validations");
+const urlUtils_1 = require("../lib/urlUtils");
 function buildImageUrl(fileName) {
     if (!fileName) {
         return undefined;
     }
-    // If the filename is actually a public URL (set by Supabase middleware), return it directly
-    if (typeof fileName === 'string' && (fileName.startsWith('http://') || fileName.startsWith('https://'))) {
-        return fileName;
-    }
-    return `/uploads/products/${fileName}`;
+    return (0, urlUtils_1.resolvePublicAssetUrl)(fileName.startsWith('http://') || fileName.startsWith('https://') ? fileName : `/uploads/products/${fileName}`);
 }
 function parseOptionGroups(value) {
     if (typeof value !== 'string') {
@@ -39,7 +36,7 @@ class ProductController {
                 return res.status(400).json({ errors: parsed.error.flatten() });
             }
             const service = new CreateProductService_1.CreateProductService();
-            const imageUrl = buildImageUrl(requestWithFile.file?.filename) ?? parsed.data.imageUrl;
+            const imageUrl = buildImageUrl(requestWithFile.file?.publicUrl ?? requestWithFile.file?.filename) ?? parsed.data.imageUrl;
             const productPayload = {
                 ...parsed.data,
                 userId: String(req.userId),
@@ -80,7 +77,7 @@ class ProductController {
             const id = String(req.params.id);
             const userId = String(req.userId);
             const service = new UpdateProductService_1.UpdateProductService();
-            const imageUrl = buildImageUrl(requestWithFile.file?.filename) ?? parsed.data.imageUrl;
+            const imageUrl = buildImageUrl(requestWithFile.file?.publicUrl ?? requestWithFile.file?.filename) ?? parsed.data.imageUrl;
             const { optionGroups, imageUrl: parsedImageUrl, ...rest } = parsed.data;
             const productPayload = {
                 id,

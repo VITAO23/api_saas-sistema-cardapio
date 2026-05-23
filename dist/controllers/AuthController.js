@@ -10,6 +10,7 @@ const validations_1 = require("../schemas/validations");
 const prisma_1 = require("../lib/prisma");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const urlUtils_1 = require("../lib/urlUtils");
 class AuthController {
     async login(req, res) {
         try {
@@ -153,7 +154,7 @@ class AuthController {
             if (!req.file) {
                 return res.status(400).json({ error: 'No file provided' });
             }
-            const avatarUrl = req.file.publicUrl ?? `/uploads/avatars/${req.file.filename}`;
+            const avatarUrl = (0, urlUtils_1.resolvePublicAssetUrl)(req.file.publicUrl ?? `/uploads/avatars/${req.file.filename}`);
             const user = await prisma_1.prisma.user.update({
                 where: { id: req.userId },
                 data: { avatarUrl },

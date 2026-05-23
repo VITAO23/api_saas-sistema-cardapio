@@ -5,6 +5,7 @@ import { LoginSchema, RegisterSchema, UpdateUserProfileSchema } from '../schemas
 import { prisma } from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { resolvePublicAssetUrl } from '../lib/urlUtils';
 
 export class AuthController {
   async login(req: Request, res: Response) {
@@ -172,7 +173,7 @@ export class AuthController {
         return res.status(400).json({ error: 'No file provided' });
       }
 
-      const avatarUrl = (req.file as any).publicUrl ?? `/uploads/avatars/${(req.file as any).filename}`;
+      const avatarUrl = resolvePublicAssetUrl((req.file as any).publicUrl ?? `/uploads/avatars/${(req.file as any).filename}`);
 
       const user = await prisma.user.update({
         where: { id: req.userId },

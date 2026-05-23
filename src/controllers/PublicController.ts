@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
-import { getPublicOrigin } from '../lib/urlUtils';
+import { getPublicOrigin, resolvePublicAssetUrl } from '../lib/urlUtils';
 
 export class PublicController {
   async show(req: Request, res: Response) {
@@ -53,7 +53,10 @@ export class PublicController {
       return res.status(404).json({ error: 'Restaurant not found' });
     }
 
-    return res.json(restaurant);
+    return res.json({
+      ...restaurant,
+      logoUrl: resolvePublicAssetUrl(restaurant.logoUrl)
+    });
   }
 
   async qr(req: Request, res: Response) {

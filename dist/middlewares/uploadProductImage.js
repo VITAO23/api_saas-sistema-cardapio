@@ -70,6 +70,9 @@ function uploadProductImage(req, res, next) {
             try {
                 // lazy import to avoid requiring supabase client when not configured
                 const { supabase } = await Promise.resolve().then(() => __importStar(require('../lib/supabaseClient')));
+                if (!supabase) {
+                    throw new Error('Supabase not configured');
+                }
                 const extension = path_1.default.extname(file.originalname).toLowerCase();
                 const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${extension}`;
                 const key = `products/${fileName}`;

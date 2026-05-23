@@ -51,7 +51,10 @@ class PublicController {
         if (!restaurant) {
             return res.status(404).json({ error: 'Restaurant not found' });
         }
-        return res.json(restaurant);
+        return res.json({
+            ...restaurant,
+            logoUrl: (0, urlUtils_1.resolvePublicAssetUrl)(restaurant.logoUrl)
+        });
     }
     async qr(req, res) {
         const { slug } = req.params;

@@ -4,18 +4,14 @@ import { ListProductsService } from '../services/product/ListProductsService';
 import { UpdateProductService } from '../services/product/UpdateProductService';
 import { DeleteProductService } from '../services/product/DeleteProductService';
 import { CreateProductSchema, UpdateProductSchema } from '../schemas/validations';
+import { resolvePublicAssetUrl } from '../lib/urlUtils';
 
 function buildImageUrl(fileName?: string) {
   if (!fileName) {
     return undefined;
   }
 
-  // If the filename is actually a public URL (set by Supabase middleware), return it directly
-  if (typeof fileName === 'string' && (fileName.startsWith('http://') || fileName.startsWith('https://'))) {
-    return fileName;
-  }
-
-  return `/uploads/products/${fileName}`;
+  return resolvePublicAssetUrl(fileName.startsWith('http://') || fileName.startsWith('https://') ? fileName : `/uploads/products/${fileName}`);
 }
 
 function parseOptionGroups(value: unknown) {
@@ -43,7 +39,7 @@ export class ProductController {
       }
 
       const service = new CreateProductService();
-      const imageUrl = buildImageUrl(requestWithFile.file?.filename) ?? parsed.data.imageUrl;
+      const imageUrl = buildImageUrl((requestWithFile.file as any)?.publicUrl ?? requestWithFile.file?.filename) ?? parsed.data.imageUrl;
       const productPayload = {
         ...parsed.data,
         userId: String(req.userId),
@@ -91,7 +87,7 @@ export class ProductController {
       const userId = String(req.userId);
 
       const service = new UpdateProductService();
-      const imageUrl = buildImageUrl(requestWithFile.file?.filename) ?? parsed.data.imageUrl;
+      const imageUrl = buildImageUrl((requestWithFile.file as any)?.publicUrl ?? requestWithFile.file?.filename) ?? parsed.data.imageUrl;
       const { optionGroups, imageUrl: parsedImageUrl, ...rest } = parsed.data;
       const productPayload = {
         id,
