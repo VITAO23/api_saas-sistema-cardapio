@@ -39,12 +39,13 @@ export class ProductController {
 
       const service = new CreateProductService();
       const imageUrl = buildImageUrl(requestWithFile.file?.filename) ?? parsed.data.imageUrl;
-
-      const product = await service.execute({
+      const productPayload = {
         ...parsed.data,
-        imageUrl,
-        userId: String(req.userId)
-      });
+        userId: String(req.userId),
+        ...(imageUrl !== undefined ? { imageUrl } : {})
+      };
+
+      const product = await service.execute(productPayload);
 
       return res.status(201).json(product);
     } catch (error) {
@@ -86,13 +87,16 @@ export class ProductController {
 
       const service = new UpdateProductService();
       const imageUrl = buildImageUrl(requestWithFile.file?.filename) ?? parsed.data.imageUrl;
-
-      const product = await service.execute({
+      const { optionGroups, imageUrl: parsedImageUrl, ...rest } = parsed.data;
+      const productPayload = {
         id,
         userId,
-        ...parsed.data,
-        imageUrl
-      });
+        ...rest,
+        ...(optionGroups !== undefined ? { optionGroups } : {}),
+        ...(imageUrl !== undefined ? { imageUrl } : {})
+      };
+
+      const product = await service.execute(productPayload);
 
       return res.json(product);
     } catch (error) {

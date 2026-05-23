@@ -9,8 +9,9 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const prisma_1 = require("../../lib/prisma");
 class LoginService {
     async execute(email, password) {
+        const normalizedEmail = email.trim().toLowerCase();
         const user = await prisma_1.prisma.user.findUnique({
-            where: { email }
+            where: { email: normalizedEmail }
         });
         if (!user) {
             throw new Error('Invalid credentials');
@@ -23,8 +24,9 @@ class LoginService {
             subject: user.id,
             expiresIn: '7d'
         });
+        const { password: _, ...userWithoutPassword } = user;
         return {
-            user,
+            user: userWithoutPassword,
             token
         };
     }

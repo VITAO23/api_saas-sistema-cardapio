@@ -1,5 +1,9 @@
 let prisma: any;
 
+if (!process.env.DATABASE_URL) {
+	throw new Error('DATABASE_URL is required. Configure Supabase Postgres in your environment.');
+}
+
 try {
 	const { PrismaClient } = require('@prisma/client');
 

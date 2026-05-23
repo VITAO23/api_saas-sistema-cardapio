@@ -1,15 +1,13 @@
 import { execSync } from 'child_process';
-import path from 'path';
-import fs from 'fs';
-
-const testDbPath = path.join(process.cwd(), 'test.db');
 
 export async function setup() {
-  if (fs.existsSync(testDbPath)) {
-    fs.unlinkSync(testDbPath);
+  const testDatabaseUrl = process.env.TEST_DATABASE_URL;
+
+  if (!testDatabaseUrl) {
+    throw new Error('TEST_DATABASE_URL is required to run integration tests.');
   }
 
-  process.env.DATABASE_URL = `file:./test.db`;
+  process.env.DATABASE_URL = testDatabaseUrl;
 
   try {
     execSync('npx prisma migrate deploy --skip-generate', {
@@ -17,12 +15,11 @@ export async function setup() {
       stdio: 'pipe'
     });
   } catch (error) {
-    console.error('Failed to run migrations for test database');
+    console.error('Failed to apply migrations to the test database');
+    throw error;
   }
 }
 
 export async function teardown() {
-  if (fs.existsSync(testDbPath)) {
-    fs.unlinkSync(testDbPath);
-  }
+  return;
 }

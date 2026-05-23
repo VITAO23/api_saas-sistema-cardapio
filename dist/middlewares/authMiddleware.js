@@ -11,6 +11,9 @@ function authMiddleware(req, res, next) {
         return res.status(401).json({ error: 'Token missing' });
     }
     const [, token] = authToken.split(' ');
+    if (!token) {
+        return res.status(401).json({ error: 'Token missing' });
+    }
     try {
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
         req.userId = decoded.sub;

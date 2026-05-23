@@ -27,7 +27,7 @@ app.use(
 );
 
 const corsOptions = {
-	origin: (origin, callback) => {
+	origin: (origin: string | undefined, callback: (error: Error | null, allow?: boolean) => void) => {
 		// Allow requests without origin (e.g., same-origin requests)
 		if (!origin) {
 			callback(null, true);

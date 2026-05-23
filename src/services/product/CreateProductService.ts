@@ -14,7 +14,7 @@ interface IRequest {
     required?: boolean;
     options?: Array<{
       name: string;
-      price?: number | null;
+      price?: number | null | undefined;
     }>;
   }>;
 }
