@@ -6,7 +6,7 @@ import { PublicController } from '../controllers/PublicController';
 import { RestaurantController } from '../controllers/RestaurantController';
 import { authMiddleware } from '../middlewares/authMiddleware';
 import { uploadProductImage } from '../middlewares/uploadProductImage';
-import { createUploadMiddleware } from '../middlewares/uploadMiddleware';
+import { createSupabaseUploadMiddleware } from '../middlewares/uploadToSupabase';
 
 const routes = Router();
 
@@ -16,12 +16,12 @@ const productController = new ProductController();
 const publicController = new PublicController();
 const restaurantController = new RestaurantController();
 
-const uploadAvatarMiddleware = createUploadMiddleware({
+const uploadAvatarMiddleware = createSupabaseUploadMiddleware({
   folder: 'avatars',
   fieldName: 'avatar'
 });
 
-const uploadLogoMiddleware = createUploadMiddleware({
+const uploadLogoMiddleware = createSupabaseUploadMiddleware({
   folder: 'logos',
   fieldName: 'logo'
 });

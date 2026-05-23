@@ -10,6 +10,11 @@ function buildImageUrl(fileName?: string) {
     return undefined;
   }
 
+  // If the filename is actually a public URL (set by Supabase middleware), return it directly
+  if (typeof fileName === 'string' && (fileName.startsWith('http://') || fileName.startsWith('https://'))) {
+    return fileName;
+  }
+
   return `/uploads/products/${fileName}`;
 }
 

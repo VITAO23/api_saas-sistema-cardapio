@@ -9,7 +9,7 @@ const PublicController_1 = require("../controllers/PublicController");
 const RestaurantController_1 = require("../controllers/RestaurantController");
 const authMiddleware_1 = require("../middlewares/authMiddleware");
 const uploadProductImage_1 = require("../middlewares/uploadProductImage");
-const uploadMiddleware_1 = require("../middlewares/uploadMiddleware");
+const uploadToSupabase_1 = require("../middlewares/uploadToSupabase");
 const routes = (0, express_1.Router)();
 exports.routes = routes;
 const authController = new AuthController_1.AuthController();
@@ -17,11 +17,11 @@ const categoryController = new CategoryController_1.CategoryController();
 const productController = new ProductController_1.ProductController();
 const publicController = new PublicController_1.PublicController();
 const restaurantController = new RestaurantController_1.RestaurantController();
-const uploadAvatarMiddleware = (0, uploadMiddleware_1.createUploadMiddleware)({
+const uploadAvatarMiddleware = (0, uploadToSupabase_1.createSupabaseUploadMiddleware)({
     folder: 'avatars',
     fieldName: 'avatar'
 });
-const uploadLogoMiddleware = (0, uploadMiddleware_1.createUploadMiddleware)({
+const uploadLogoMiddleware = (0, uploadToSupabase_1.createSupabaseUploadMiddleware)({
     folder: 'logos',
     fieldName: 'logo'
 });

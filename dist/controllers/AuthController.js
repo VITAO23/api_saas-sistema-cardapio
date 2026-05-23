@@ -153,7 +153,7 @@ class AuthController {
             if (!req.file) {
                 return res.status(400).json({ error: 'No file provided' });
             }
-            const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+            const avatarUrl = req.file.publicUrl ?? `/uploads/avatars/${req.file.filename}`;
             const user = await prisma_1.prisma.user.update({
                 where: { id: req.userId },
                 data: { avatarUrl },
