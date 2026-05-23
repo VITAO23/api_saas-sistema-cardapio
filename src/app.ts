@@ -14,11 +14,11 @@ const allowedOrigins = (process.env.CORS_ORIGINS ?? '')
 	.map((origin) => origin.trim())
 	.filter((origin) => origin.length > 0);
 
-const fallbackOrigins = [
-	'http://localhost:5173',
-	'https://frontend-sistema-de-cardapio-saa-s.vercel.app',
-	'https://sistema-de-cardapio-saas-88749xcdp-projetos-online.vercel.app'
-];
+// Keep only safe local defaults in code. Production origins must be set via env `CORS_ORIGINS` or `FALLBACK_ORIGINS`.
+const fallbackOrigins = (process.env.FALLBACK_ORIGINS ?? 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter((origin) => origin.length > 0);
 
 const corsAllowedOrigins = Array.from(new Set([...allowedOrigins, ...fallbackOrigins]));
 

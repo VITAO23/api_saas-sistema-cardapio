@@ -21,7 +21,8 @@ const allowedOrigins = (process.env.CORS_ORIGINS ?? '')
 const fallbackOrigins = [
     'http://localhost:5173',
     'https://frontend-sistema-de-cardapio-saa-s.vercel.app',
-    'https://sistema-de-cardapio-saas-88749xcdp-projetos-online.vercel.app'
+    'https://sistema-de-cardapio-saas-88749xcdp-projetos-online.vercel.app',
+    'https://sistema-de-cardapio-saas-omi5vf4n9-projetos-online.vercel.app'
 ];
 const corsAllowedOrigins = Array.from(new Set([...allowedOrigins, ...fallbackOrigins]));
 const windowMs = Number(process.env.RATE_LIMIT_WINDOW_MS ?? '900000');
