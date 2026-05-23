@@ -10,6 +10,9 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
     // Log a clear message for developers.
     console.warn('Supabase not fully configured: set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_KEY)');
 }
+else if (SUPABASE_KEY.startsWith('sb_publishable_')) {
+    console.warn('Supabase configured with a publishable key; storage uploads require the secret/service_role key.');
+}
 else {
     supabaseClient = (0, supabase_js_1.createClient)(SUPABASE_URL, SUPABASE_KEY);
 }

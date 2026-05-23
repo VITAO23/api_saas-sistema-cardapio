@@ -40,6 +40,9 @@ export function createSupabaseUploadMiddleware(config: SupabaseUploadConfig) {
 
       try {
         if (!supabase) throw new Error('Supabase client not initialized');
+        if ((process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_KEY ?? '').startsWith('sb_publishable_')) {
+          throw new Error('SUPABASE_SERVICE_ROLE_KEY is using a publishable key; set the secret/service_role key in Render');
+        }
 
         const { data: bucketData, error: bucketError } = await supabase.storage.getBucket(bucket);
         if (bucketError || !bucketData) {

@@ -43,6 +43,9 @@ export function uploadProductImage(req: Request, res: Response, next: NextFuncti
         if (!supabase) {
           throw new Error('Supabase not configured');
         }
+        if ((process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_KEY ?? '').startsWith('sb_publishable_')) {
+          throw new Error('SUPABASE_SERVICE_ROLE_KEY is using a publishable key; set the secret/service_role key in Render');
+        }
 
         const extension = path.extname(file.originalname).toLowerCase();
         const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${extension}`;

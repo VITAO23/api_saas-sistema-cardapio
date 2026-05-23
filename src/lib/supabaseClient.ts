@@ -9,6 +9,8 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
   // Do not throw at import time; allow the app to start in environments without Supabase configured.
   // Log a clear message for developers.
   console.warn('Supabase not fully configured: set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_KEY)');
+} else if (SUPABASE_KEY.startsWith('sb_publishable_')) {
+  console.warn('Supabase configured with a publishable key; storage uploads require the secret/service_role key.');
 } else {
   supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 }

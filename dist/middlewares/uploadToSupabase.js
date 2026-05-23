@@ -36,6 +36,9 @@ function createSupabaseUploadMiddleware(config) {
             try {
                 if (!supabaseClient_1.supabase)
                     throw new Error('Supabase client not initialized');
+                if ((process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_KEY ?? '').startsWith('sb_publishable_')) {
+                    throw new Error('SUPABASE_SERVICE_ROLE_KEY is using a publishable key; set the secret/service_role key in Render');
+                }
                 const { data: bucketData, error: bucketError } = await supabaseClient_1.supabase.storage.getBucket(bucket);
                 if (bucketError || !bucketData) {
                     throw new Error(`Bucket "${bucket}" not found in Supabase Storage`);
