@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: api-saas-sistema-cardapio
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    autoDeploy: true
