@@ -3,6 +3,6 @@ services:
     name: api-saas-sistema-cardapio
     env: node
     plan: free
-    buildCommand: npm install && npm run build
+    buildCommand: npm install && npm run prisma:generate && npm run build
     startCommand: npm start
     autoDeploy: true
