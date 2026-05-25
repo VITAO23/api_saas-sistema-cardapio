@@ -57,6 +57,7 @@ routes.post('/restaurants/:id/delivery-area', authMiddleware, restaurantControll
 // Public menu routes (no auth)
 routes.get('/r/:slug', publicController.show);
 routes.get('/r/:slug/qr', publicController.qr);
+routes.get('/assets/proxy', publicController.proxyAsset);
 // Alias routes for backwards compatibility / frontend expectations
 routes.get('/restaurants/:slug', publicController.show);
 routes.get('/restaurants/:slug/qr', publicController.qr);

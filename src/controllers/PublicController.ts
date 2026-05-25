@@ -2,6 +2,25 @@ import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 import { getPublicOrigin, resolvePublicAssetUrl } from '../lib/urlUtils';
 
+function isAllowedProxyTarget(rawUrl: string) {
+  try {
+    const parsedUrl = new URL(rawUrl);
+
+    if (parsedUrl.protocol !== 'https:') {
+      return false;
+    }
+
+    return (
+      parsedUrl.hostname.endsWith('.supabase.co') ||
+      parsedUrl.hostname === 'supabase.co' ||
+      parsedUrl.hostname.endsWith('.supabase.in') ||
+      parsedUrl.hostname === 'supabase.in'
+    );
+  } catch {
+    return false;
+  }
+}
+
 function normalizeRestaurantAssets<T extends { logoUrl: string | null }>(restaurant: T) {
   return {
     ...restaurant,
@@ -106,6 +125,20 @@ export class PublicController {
     } catch (err: any) {
       return res.status(500).json({ error: 'Failed to generate QR code', details: err?.message });
     }
+  }
+
+  async proxyAsset(req: Request, res: Response) {
+    const rawUrl = String(req.query.url ?? '').trim();
+
+    if (!rawUrl) {
+      return res.status(400).json({ error: 'Missing url parameter' });
+    }
+
+    if (!isAllowedProxyTarget(rawUrl)) {
+      return res.status(400).json({ error: 'Invalid proxy target' });
+    }
+
+    return res.redirect(302, rawUrl);
   }
 }
 

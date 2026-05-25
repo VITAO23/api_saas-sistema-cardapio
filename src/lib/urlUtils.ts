@@ -11,15 +11,50 @@ export function getPublicAssetOrigin() {
   return process.env.ASSET_PUBLIC_ORIGIN ?? getPublicOrigin();
 }
 
+function isSupabaseStorageUrl(rawUrl: string) {
+  try {
+    const parsedUrl = new URL(rawUrl);
+    return (
+      parsedUrl.hostname.endsWith('.supabase.co') ||
+      parsedUrl.hostname === 'supabase.co' ||
+      parsedUrl.hostname.endsWith('.supabase.in') ||
+      parsedUrl.hostname === 'supabase.in'
+    );
+  } catch {
+    return false;
+  }
+}
+
 export function resolvePublicAssetUrl(assetUrl?: string | null) {
   if (!assetUrl) {
     return assetUrl ?? undefined;
   }
 
-  if (assetUrl.startsWith('http://') || assetUrl.startsWith('https://')) {
-    return assetUrl;
+  const trimmedUrl = assetUrl.trim();
+
+  if (!trimmedUrl) {
+    return undefined;
   }
 
-  const normalizedPath = assetUrl.startsWith('/') ? assetUrl : `/${assetUrl}`;
-  return `${getPublicAssetOrigin()}${normalizedPath}`;
+  if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+    if (isSupabaseStorageUrl(trimmedUrl)) {
+      return `/assets/proxy?url=${encodeURIComponent(trimmedUrl)}`;
+    }
+
+    try {
+      const publicOrigin = new URL(getPublicAssetOrigin());
+      const parsedUrl = new URL(trimmedUrl);
+
+      if (parsedUrl.origin === publicOrigin.origin) {
+        return `${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`;
+      }
+    } catch {
+      // Keep falling through to the original URL when we cannot normalize it.
+    }
+
+    return trimmedUrl;
+  }
+
+  const normalizedPath = trimmedUrl.startsWith('/') ? trimmedUrl : `/${trimmedUrl}`;
+  return normalizedPath;
 }
