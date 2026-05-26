@@ -29,6 +29,21 @@ function isSupabaseStorageUrl(rawUrl: string) {
   }
 }
 
+function extractProxyTarget(rawPath: string) {
+  try {
+    const parsedUrl = new URL(rawPath, 'http://localhost');
+    const proxiedUrl = parsedUrl.searchParams.get('url');
+
+    if (parsedUrl.pathname === '/assets/proxy' && proxiedUrl) {
+      return decodeURIComponent(proxiedUrl);
+    }
+  } catch {
+    // Ignore malformed proxy paths.
+  }
+
+  return null;
+}
+
 export function resolvePublicAssetUrl(assetUrl?: string | null) {
   if (!assetUrl) {
     return assetUrl ?? undefined;
@@ -40,15 +55,13 @@ export function resolvePublicAssetUrl(assetUrl?: string | null) {
     return undefined;
   }
 
+  const proxyTarget = extractProxyTarget(trimmedUrl);
+  if (proxyTarget) {
+    return proxyTarget;
+  }
+
   if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
     if (isSupabaseStorageUrl(trimmedUrl)) {
-      // Public Supabase buckets do not require proxying; returning direct URL avoids
-      // frontend/private-network issues when proxy origin is misconfigured.
-      if (process.env.USE_ASSET_PROXY === 'true') {
-        const proxyBase = trimTrailingSlash(getPublicAssetOrigin());
-        return `${proxyBase}/assets/proxy?url=${encodeURIComponent(trimmedUrl)}`;
-      }
-
       return trimmedUrl;
     }
 
