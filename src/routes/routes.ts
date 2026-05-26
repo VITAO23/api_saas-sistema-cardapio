@@ -18,14 +18,12 @@ const restaurantController = new RestaurantController();
 
 const uploadAvatarMiddleware = createSupabaseUploadMiddleware({
   folder: 'avatars',
-  fieldName: 'avatar',
-  bucket: 'avatars'
+  fieldName: 'avatar'
 });
 
 const uploadLogoMiddleware = createSupabaseUploadMiddleware({
   folder: 'logo',
-  fieldName: 'logo',
-  bucket: 'logo'
+  fieldName: 'logo'
 });
 
 routes.post('/login', authController.login);
