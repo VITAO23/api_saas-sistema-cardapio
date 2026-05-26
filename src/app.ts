@@ -14,6 +14,11 @@ const allowedOrigins = (process.env.CORS_ORIGINS ?? '')
 	.map((origin) => origin.trim())
 	.filter((origin) => origin.length > 0);
 
+const wildcardOrigins = (process.env.CORS_ORIGIN_PATTERNS ?? '')
+	.split(',')
+	.map((origin) => origin.trim())
+	.filter((origin) => origin.length > 0);
+
 const frontendOrigin = (process.env.FRONTEND_ORIGIN ?? '').trim();
 
 // Keep only safe local defaults in code. Production origins must be set via env `CORS_ORIGINS`, `FALLBACK_ORIGINS`, or `FRONTEND_ORIGIN`.
@@ -23,6 +28,14 @@ const fallbackOrigins = (process.env.FALLBACK_ORIGINS ?? 'http://localhost:5173'
   .filter((origin) => origin.length > 0);
 
 const corsAllowedOrigins = Array.from(new Set([...allowedOrigins, ...fallbackOrigins, ...(frontendOrigin ? [frontendOrigin] : [])]));
+
+function matchesWildcardOrigin(origin: string) {
+	return wildcardOrigins.some((pattern) => {
+		const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
+		const regex = new RegExp(`^${escaped}$`);
+		return regex.test(origin);
+	});
+}
 
 const windowMs = Number(process.env.RATE_LIMIT_WINDOW_MS ?? '900000');
 const maxRequests = Number(process.env.RATE_LIMIT_MAX ?? '100');
@@ -52,6 +65,12 @@ const corsOptions = {
 
 		// Check if origin is in allowed list
 		if (corsAllowedOrigins.includes(origin)) {
+			callback(null, true);
+			return;
+		}
+
+		// Check wildcard origin patterns (e.g. Vercel preview domains)
+		if (matchesWildcardOrigin(origin)) {
 			callback(null, true);
 			return;
 		}
