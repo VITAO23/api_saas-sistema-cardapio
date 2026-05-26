@@ -52,11 +52,6 @@ export function uploadProductImage(req: Request, res: Response, next: NextFuncti
         const key = `products/${fileName}`;
         const bucket = 'products';
 
-        const { data: bucketData, error: bucketError } = await supabase.storage.getBucket(bucket);
-        if (bucketError || !bucketData) {
-          throw new Error(`Bucket "${bucket}" not found in Supabase Storage`);
-        }
-
         const { error: uploadError } = await supabase.storage.from(bucket).upload(key, file.buffer as Buffer, {
           contentType: file.mimetype,
           upsert: false

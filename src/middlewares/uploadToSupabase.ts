@@ -44,11 +44,6 @@ export function createSupabaseUploadMiddleware(config: SupabaseUploadConfig) {
           throw new Error('SUPABASE_SERVICE_ROLE_KEY is using a publishable key; set the secret/service_role key in Render');
         }
 
-        const { data: bucketData, error: bucketError } = await supabase.storage.getBucket(bucket);
-        if (bucketError || !bucketData) {
-          throw new Error(`Bucket "${bucket}" not found in Supabase Storage`);
-        }
-
         const { error: uploadError } = await supabase.storage.from(bucket).upload(key, file.buffer as Buffer, {
           contentType: file.mimetype,
           upsert: false
