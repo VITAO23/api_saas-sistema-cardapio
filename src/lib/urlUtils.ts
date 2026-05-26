@@ -11,6 +11,10 @@ export function getPublicAssetOrigin() {
   return process.env.ASSET_PUBLIC_ORIGIN ?? getPublicOrigin();
 }
 
+function trimTrailingSlash(url: string) {
+  return url.endsWith('/') ? url.slice(0, -1) : url;
+}
+
 function isSupabaseStorageUrl(rawUrl: string) {
   try {
     const parsedUrl = new URL(rawUrl);
@@ -25,6 +29,21 @@ function isSupabaseStorageUrl(rawUrl: string) {
   }
 }
 
+function extractProxyTarget(rawPath: string) {
+  try {
+    const parsedUrl = new URL(rawPath, 'http://localhost');
+    const proxiedUrl = parsedUrl.searchParams.get('url');
+
+    if (parsedUrl.pathname === '/assets/proxy' && proxiedUrl) {
+      return decodeURIComponent(proxiedUrl);
+    }
+  } catch {
+    // Ignore malformed proxy paths.
+  }
+
+  return null;
+}
+
 export function resolvePublicAssetUrl(assetUrl?: string | null) {
   if (!assetUrl) {
     return assetUrl ?? undefined;
@@ -36,9 +55,14 @@ export function resolvePublicAssetUrl(assetUrl?: string | null) {
     return undefined;
   }
 
+  const proxyTarget = extractProxyTarget(trimmedUrl);
+  if (proxyTarget) {
+    return proxyTarget;
+  }
+
   if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
     if (isSupabaseStorageUrl(trimmedUrl)) {
-      return `/assets/proxy?url=${encodeURIComponent(trimmedUrl)}`;
+      return trimmedUrl;
     }
 
     try {
