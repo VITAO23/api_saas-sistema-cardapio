@@ -11,6 +11,10 @@ export function getPublicAssetOrigin() {
   return process.env.ASSET_PUBLIC_ORIGIN ?? getPublicOrigin();
 }
 
+function trimTrailingSlash(url: string) {
+  return url.endsWith('/') ? url.slice(0, -1) : url;
+}
+
 function isSupabaseStorageUrl(rawUrl: string) {
   try {
     const parsedUrl = new URL(rawUrl);
@@ -38,7 +42,14 @@ export function resolvePublicAssetUrl(assetUrl?: string | null) {
 
   if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
     if (isSupabaseStorageUrl(trimmedUrl)) {
-      return `/assets/proxy?url=${encodeURIComponent(trimmedUrl)}`;
+      // Public Supabase buckets do not require proxying; returning direct URL avoids
+      // frontend/private-network issues when proxy origin is misconfigured.
+      if (process.env.USE_ASSET_PROXY === 'true') {
+        const proxyBase = trimTrailingSlash(getPublicAssetOrigin());
+        return `${proxyBase}/assets/proxy?url=${encodeURIComponent(trimmedUrl)}`;
+      }
+
+      return trimmedUrl;
     }
 
     try {
